@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
-export async function uploadOnCloudinary(uploadFilePath: string) {
+export async function uploadOnCloudinary(uploadFilePath: string | undefined) {
   try {
     if (!uploadFilePath) return "Local file path is not found";
     const response = await cloudinary.uploader.upload(uploadFilePath, {

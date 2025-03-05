@@ -1,8 +1,8 @@
 import { Request } from "express";
 import mongoose, { Document, ObjectId } from "mongoose";
-import { IProduct } from "./product";
+import { Product } from "./product";
 
-export interface IUser extends Document {
+export interface User extends Document {
   name: string;
   avatar?: string;
   email: string;

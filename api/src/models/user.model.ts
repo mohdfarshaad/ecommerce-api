@@ -1,10 +1,10 @@
 import mongoose, { Schema } from "mongoose";
-import { AccessTokenPayload, IUser, RefreshTokenPayload } from "../types/user";
+import { AccessTokenPayload, User, RefreshTokenPayload } from "../types/user";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { config } from "../config";
 
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<User>(
   {
     name: {
       type: String,
@@ -47,7 +47,7 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (this: IUser, next) {
+userSchema.pre("save", async function (this: User, next) {
   if (!this.isModified("password")) {
     return next();
   }
@@ -56,13 +56,13 @@ userSchema.pre("save", async function (this: IUser, next) {
 });
 
 userSchema.methods.isPasswordCorrect = async function (
-  this: IUser,
+  this: User,
   password: string
 ): Promise<boolean> {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.generateAccessToken = function (this: IUser) {
+userSchema.methods.generateAccessToken = function (this: User) {
   const payload: AccessTokenPayload = {
     _id: this._id,
     name: this.name,
@@ -76,7 +76,7 @@ userSchema.methods.generateAccessToken = function (this: IUser) {
   return jwt.sign(payload, config.ACCESS_TOKEN_SECRET, options);
 };
 
-userSchema.methods.generateRefreshToken = function (this: IUser) {
+userSchema.methods.generateRefreshToken = function (this: User) {
   const payload: RefreshTokenPayload = {
     _id: this._id,
   };
@@ -88,4 +88,6 @@ userSchema.methods.generateRefreshToken = function (this: IUser) {
   return jwt.sign(payload, config.REFRESH_TOKEN_SECRET, options);
 };
 
-export const User = mongoose.model<IUser>("User", userSchema);
+const UserModel = mongoose.model<User>("User", userSchema);
+
+export default UserModel;
