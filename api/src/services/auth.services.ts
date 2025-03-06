@@ -1,15 +1,15 @@
 import { verify } from "jsonwebtoken";
-import { User } from "../models/user.model";
 import { ApiError } from "../utils/ApiError";
 import { config } from "../config";
 import { decodedToken } from "../middlewares/auth.middleware";
+import UserModel from "../models/user.model";
 
 export const isExistingUser = async (email: string) => {
-  return await User.findOne({ email }).select("-password -refreshToken");
+  return await UserModel.findOne({ email }).select("-password -refreshToken");
 };
 
 export const generateTokens = async (userId: string) => {
-  const user = await User.findById(userId);
+  const user = await UserModel.findById(userId);
 
   if (!user) {
     throw ApiError.unauthorized();
@@ -26,12 +26,12 @@ export const generateTokens = async (userId: string) => {
 };
 
 export const isPasswordValid = async (userId: string, password: string) => {
-  const user = await User.findById(userId);
+  const user = await UserModel.findById(userId);
   return await user?.isPasswordCorrect(password);
 };
 
 export const clearRefreshToken = async (userId: {}) => {
-  return await User.findByIdAndUpdate(
+  return await UserModel.findByIdAndUpdate(
     userId,
     {
       $set: { refreshToken: null },

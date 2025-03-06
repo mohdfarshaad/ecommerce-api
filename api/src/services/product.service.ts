@@ -27,7 +27,7 @@ export const updateProduct = async (
     description?: string;
     price: number;
   },
-  productId: {},
+  productId: string,
   imageUrl: string
 ) => {
   return await ProductModel.findByIdAndUpdate(productId, {

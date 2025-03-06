@@ -14,7 +14,7 @@ export interface Product extends Document {
   updatedAt?: Date;
 }
 
-export interface CreateProductRequest extends Request {
+export interface ProductRequest extends Request {
   user?: User;
   body: Product;
   file?: Express.Multer.File;
