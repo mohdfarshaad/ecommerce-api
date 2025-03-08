@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { IUser } from "../types/user";
+import { User } from "../types/user";
 import { ApiError } from "../utils/ApiError";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { config } from "../config";
-import { User } from "../models/user.model";
+import  UserModel  from "../models/user.model";
 
 interface JWTVerificationRequest extends Request {
-  user?: IUser;
+  user?: User;
   cookies: {
     AccessToken: any;
     RefreshToken: any;
@@ -35,7 +35,7 @@ export async function verifyJWT(
       token,
       config.ACCESS_TOKEN_SECRET
     ) as decodedToken;
-    const user = await User.findById(decodedToken._id).select(
+    const user = await UserModel.findById(decodedToken._id).select(
       "-password -refreshToken"
     );
 
