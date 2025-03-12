@@ -60,7 +60,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   const checkPassword = await isPasswordValid(userId, password);
 
   if (!checkPassword) {
-    throw ApiError.badRequest();
+    throw ApiError.badRequest("Invalid Password");
   }
 
   const { accessToken, refreshToken } = await generateTokens(userId);

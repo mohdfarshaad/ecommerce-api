@@ -62,7 +62,7 @@ export const createProduct = asyncHandler(
 
 export const updateProductById = asyncHandler(
   async (req: ProductRequest, res: Response) => {
-    const productId = req.params.id;
+    const productId =  Object(req.params.id.replace(":", "")) ;
     const { title, category, description, price } = req.body;
     const file = req.file;
 
@@ -77,10 +77,11 @@ export const updateProductById = asyncHandler(
     )) as UploadApiResponse;
 
     if (!uploadImage) {
-      throw ApiError.internal("Image upload failed");
+      throw ApiError.internal();
     }
 
     const imageUrl = uploadImage.url;
+    
 
     const updatedProduct = await updateProduct(
       {
@@ -92,6 +93,12 @@ export const updateProductById = asyncHandler(
       productId,
       imageUrl
     );
+
+    console.log(updateProduct);
+    
+    if (!updateProduct) {
+      throw ApiError.internal()
+    }
 
     res
       .status(201)

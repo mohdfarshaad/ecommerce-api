@@ -1,4 +1,6 @@
+import { MongooseError, ObjectId } from "mongoose";
 import ProductModel from "../models/product.model";
+import { ApiError } from "../utils/ApiError";
 
 export const AddProduct = async (
   data: {
@@ -27,16 +29,35 @@ export const updateProduct = async (
     description?: string;
     price: number;
   },
-  productId: string,
+  productId: ObjectId,
   imageUrl: string
 ) => {
-  return await ProductModel.findByIdAndUpdate(productId, {
-    title: data.title,
-    image: imageUrl,
-    category: data.category,
-    description: data.description,
-    price: data.price,
-  });
+  try {
+    const producutUpdateResult = await ProductModel.findByIdAndUpdate(
+      productId,
+      {
+        title: data.title,
+        image: imageUrl,
+        category: data.category,
+        description: data.description,
+        price: data.price,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!producutUpdateResult) {
+      throw ApiError.internal("Update product failed");
+    }
+    return producutUpdateResult;
+  } catch (error) {
+    if (error instanceof MongooseError) {
+      console.error(error);
+    } else {
+      console.error(error);
+    }
+  }
 };
 
 export const deleteProduct = async (productId: {}) => {
