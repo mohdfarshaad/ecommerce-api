@@ -3,7 +3,7 @@ import { User } from "../types/user";
 import { ApiError } from "../utils/ApiError";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { config } from "../config";
-import  UserModel  from "../models/user.model";
+import UserModel from "../models/user.model";
 
 interface JWTVerificationRequest extends Request {
   user?: User;
@@ -28,7 +28,7 @@ export async function verifyJWT(
       req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      throw ApiError.unauthorized;
+      throw ApiError.unauthorized();
     }
 
     const decodedToken = jwt.verify(
@@ -40,7 +40,7 @@ export async function verifyJWT(
     );
 
     if (!user) {
-      throw new ApiError(401, "Unauthorized request");
+      throw ApiError.unauthorized();
     }
 
     req.user = user;

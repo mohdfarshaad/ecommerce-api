@@ -9,10 +9,11 @@ import {
   deleteProduct,
   fetchAllProduct,
   fetchProduct,
-  fetchProductByCategory,
+  fetchProductByCategoryName,
   updateProduct,
 } from "../services/product.service";
 import { UploadApiResponse } from "cloudinary";
+import { Types } from "mongoose";
 
 export const createProduct = asyncHandler(
   async (req: ProductRequest, res: Response) => {
@@ -62,7 +63,7 @@ export const createProduct = asyncHandler(
 
 export const updateProductById = asyncHandler(
   async (req: ProductRequest, res: Response) => {
-    const productId =  Object(req.params.id.replace(":", "")) ;
+    const productId = Object(req.params.id.replace(":", ""));
     const { title, category, description, price } = req.body;
     const file = req.file;
 
@@ -81,7 +82,6 @@ export const updateProductById = asyncHandler(
     }
 
     const imageUrl = uploadImage.url;
-    
 
     const updatedProduct = await updateProduct(
       {
@@ -94,10 +94,8 @@ export const updateProductById = asyncHandler(
       imageUrl
     );
 
-    console.log(updateProduct);
-    
     if (!updateProduct) {
-      throw ApiError.internal()
+      throw ApiError.internal();
     }
 
     res
@@ -130,33 +128,6 @@ export const deleteProductById = asyncHandler(
   }
 );
 
-export const getProductById = asyncHandler(
-  async (req: ProductRequest, res: Response) => {
-    const productId = req.params.id;
-    const userId = req.user?._id;
-
-    if (!userId) {
-      throw ApiError.unauthorized();
-    }
-
-    if (!productId) {
-      throw ApiError.accessDenied();
-    }
-
-    const product = await fetchProduct(productId);
-
-    if (!product) {
-      throw ApiError.internal();
-    }
-
-    res
-      .status(200)
-      .json(
-        new ApiResponse(200, product, "Product by id fetched successfully")
-      );
-  }
-);
-
 export const getProducts = asyncHandler(
   async (req: ProductRequest, res: Response) => {
     const userId = req.user?._id;
@@ -177,6 +148,33 @@ export const getProducts = asyncHandler(
   }
 );
 
+export const getProductById = asyncHandler(
+  async (req: ProductRequest, res: Response) => {
+    const id = req.params.id;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      throw ApiError.unauthorized();
+    }
+
+    if (!id || !Types.ObjectId.isValid(id)) {
+      throw ApiError.accessDenied();
+    }
+
+    const product = await fetchProduct(new Types.ObjectId(id));
+
+    if (!product) {
+      throw ApiError.internal();
+    }
+
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, product, "Product by id fetched successfully")
+      );
+  }
+);
+
 export const getProductByCategory = asyncHandler(
   async (req: ProductRequest, res: Response) => {
     const userId = req.user?._id;
@@ -185,12 +183,11 @@ export const getProductByCategory = asyncHandler(
     if (!userId) {
       throw ApiError.unauthorized();
     }
-
     if (!category) {
       throw ApiError.badRequest();
     }
 
-    const products = await fetchProductByCategory(category);
+    const products = await fetchProductByCategoryName(category);
 
     if (!products) {
       throw ApiError.internal();

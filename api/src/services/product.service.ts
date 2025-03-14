@@ -1,4 +1,4 @@
-import { MongooseError, ObjectId } from "mongoose";
+import { MongooseError, ObjectId, Types } from "mongoose";
 import ProductModel from "../models/product.model";
 import { ApiError } from "../utils/ApiError";
 
@@ -64,7 +64,7 @@ export const deleteProduct = async (productId: {}) => {
   return await ProductModel.findByIdAndDelete(productId);
 };
 
-export const fetchProduct = async (productId: {}) => {
+export const fetchProduct = async (productId: Types.ObjectId) => {
   return await ProductModel.findOne(productId);
 };
 
@@ -72,6 +72,6 @@ export const fetchAllProduct = async () => {
   return await ProductModel.find();
 };
 
-export const fetchProductByCategory = async (category: string) => {
-  return await ProductModel.find({ category });
+export const fetchProductByCategoryName = async (name: string) => {
+  return await ProductModel.find({ category: name });
 };
